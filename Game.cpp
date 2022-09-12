@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include"Node.h"
+#include "List.h"
 #define SIZE  4 
 
 using std::string;
@@ -17,38 +19,41 @@ using std::endl;
  */
 Stack<int> Game::createRandomBoard()
 {
-
+	
 	Stack<int> s;
-	
-	
-
-	int min = 1;
+	List<int>* start = new List <int>();
+	start->next = new Node<int>();
+	Node<int>* temp = start->next;
 	int max = SIZE * SIZE;
-	int numbers[SIZE * SIZE + 1]{ 0 };
-	//push random numbers to the stack
+	//initialize List
+
+	for (int i = 1; i < SIZE*SIZE+1; i++)
+	{
+		while (temp->next != NULL)
+		{
+			temp = temp->next;
+		}
+		temp->value = i;
+		temp->next = new Node<int>();
+	}
+	temp->next = NULL;
+	
+	//put random number in the stack
 	for (int i = 0; i < SIZE * SIZE; i++)
 	{
-		
-		srand(time(NULL));
-		int randomNumber = rand() % max + min ;
-
-		
-		while (numbers[randomNumber-1] == 1)
-		{
-			srand(time(NULL));
-	        randomNumber = rand() % max + min ;
-		}
-		if (randomNumber == max)
+		int randomNumber = rand() % max + 1;
+		randomNumber = start->remove(randomNumber);
+		cout << "Push:  " << randomNumber << endl;
+		s.push(randomNumber);
+		if (max > 1)
 		{
 			max--;
 		}
-		if (randomNumber == min)
-		{
-			min++;
-		}
-		numbers[randomNumber] = 1;
-		s.push(randomNumber);
+		
 	}
+	
+	s.print();
+	
 	return s;
 }
 
