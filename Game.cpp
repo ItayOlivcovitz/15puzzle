@@ -17,7 +17,7 @@ using std::endl;
  *
  * @return Stack<int>
  */
-Stack<int> Game::createRandomBoard()
+void Game::createRandomBoard()
 {
 	
 	Stack<int> s;
@@ -41,9 +41,9 @@ Stack<int> Game::createRandomBoard()
 	//put random number in the stack
 	for (int i = 0; i < SIZE * SIZE; i++)
 	{
+		srand(time(NULL));
 		int randomNumber = rand() % max + 1;
 		randomNumber = start->remove(randomNumber);
-		cout << "Push:  " << randomNumber << endl;
 		s.push(randomNumber);
 		if (max > 1)
 		{
@@ -51,10 +51,8 @@ Stack<int> Game::createRandomBoard()
 		}
 		
 	}
-	
-	s.print();
-	
-	return s;
+	 
+	initialize(s);
 }
 
 
@@ -64,16 +62,12 @@ Stack<int> Game::createRandomBoard()
  */
 Game::Game()
 {
-	Stack<int> randomBoard;
 	board = new int* [SIZE];
 	for (int i = 0; i < SIZE; i++)
 	{
 		board[i] = new int[SIZE];
 	}
-	randomBoard = createRandomBoard();
-	initialize(randomBoard);
-	
-
+	createRandomBoard();
 }
 
 /**
