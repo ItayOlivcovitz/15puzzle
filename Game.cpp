@@ -72,37 +72,54 @@ Game::Game()
 
 /**
  * @brief Chacking if the user as won
- *
- * @return int: 0 - lose , 1 - won
  */
-int Game::win()
+void Game::win()
 {
 	int count1 = 1;
-	int count2 = SIZE-1;
+	int fromDownToUp = 0;
+	int fromUpToDown = 0;
+	int count2 = SIZE;
 	for (int i = 0; i < SIZE; i++)
 	{
 		for (int j = 0; j < SIZE; j++)
 		{
-			if (this->board[i][j] != count1 || this->board[i][j] != count2)
+			if (this->board[i][j] != count1 )//|| this->board[i][j] != count2)
 			{
-				return 0;
+				fromUpToDown++;
 			}
 			count1++;
-			count2--;
+			
 		}
-		return 1;
+		
 
 	}
-	return 0;
+
+
+	for (int i = 0; i < SIZE; i++)
+	{
+		for (int j = 0; j < SIZE; j++)
+		{
+			if (this->board[i][j] != count2)
+			{
+				fromUpToDown++;
+			}
+			count2--;
+		}
+		
+
+	}
+	if (fromUpToDown == 16 || fromDownToUp == 16)
+	{
+	     cout << "win" << endl;
+	}
 }
 void Game::testWin()
 {
-	int** winBoard = generateAWinningBoard();
+	 //int** winBoard = generateAWinningBoard();
+	//Game::printArray(winBoard);
 	this->board = generateAWinningBoard();
-	if ( win() )
-	{
-		cout << "win" << endl;
-	}
+	this->print();
+	win();
 
 }
 int** Game::generateAWinningBoard()
@@ -169,6 +186,37 @@ void Game::print() const
 			}
 
 			
+		}
+		cout << "" << endl;
+	}
+}
+
+void Game::printArray( int** board) 
+{
+	cout << "" << endl;
+
+	for (int i = 0; i < SIZE; i++)
+	{
+		for (int j = 0; j < SIZE; j++)
+		{
+			cout << "  ";
+			if (board[i][j] == 16)
+			{
+				cout << "e";
+			}
+			else
+				cout << board[i][j];
+
+			if (board[i][j] < 10)
+			{
+				cout << "  ";
+			}
+			else
+			{
+				cout << " ";
+			}
+
+
 		}
 		cout << "" << endl;
 	}

@@ -21,7 +21,7 @@ class Game
 	
 	void initialize(Stack<int>);
 	void createRandomBoard();
-	int win();
+	void win();
 	
 
 public:
@@ -29,4 +29,5 @@ public:
 	Game ();
 	
 	void print() const;
+	static  void printArray( int** board)   ;
 };
