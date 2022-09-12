@@ -20,7 +20,7 @@ class Game
 	int**  generateAWinningBoard();
 	
 	void initialize(Stack<int>);
-	Stack<int> createRandomBoard();
+	void createRandomBoard();
 	int win();
 	
 
