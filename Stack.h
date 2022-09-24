@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "list.h"
+#include "Node.h"
 using std::string;
 using std::to_string;
 using std::cout;
@@ -16,17 +16,19 @@ template<class T = int >
 class Stack
 {
 	int elements;
-	list<T>* start;
-	list<T>* end;
+	Node<T>* start;
+	Node<T>* end;
 
-	list<T>* updateEnd()
+	Node<T>* updateEnd()
 	{
-		list<T>* newEnd = this->start;
-		for (int i = 0; i < this->elements-1; i++)
+		Node<T>* newEnd = this->start;
+		
+		for (int i = 0; i < this->elements; i++)
 		{
 			newEnd = newEnd->next;
 		}
 		newEnd->next = NULL;
+
 		return newEnd;
 	}
 
@@ -34,21 +36,30 @@ public:
 	Stack()
 	{
 		start = NULL;
-		start = new list<T>;
-		end = start;
+	//	start = new Node<T>;
+		end = NULL;
 		this->elements = 0;
 	}
 
 	void push(const T value)
 	{
-		this->end->value = value;
-		this->elements = this->elements + 1;
 
-		list<T>* newList = new list<T>;
-		newList->value = value;
-		end->next = newList;
-
-		end = newList;
+		if (this->elements == 0)
+		{
+			this->start = new Node<T>;
+			this->start->value = value ;
+			this->end = start;
+		}
+		else
+		{
+			
+			
+			this->end->next = new Node<T>;
+			this->end->next->value = value;
+			this->end = updateEnd();
+		}
+		this->elements++;
+		
 
 
 	}
@@ -56,7 +67,7 @@ public:
 	{
 		T value;
 		
-		list<T>* needToDelete = this->end;
+		Node<T>* needToDelete = this->end;
 		value = this->end->value;
 
 		this->elements = this->elements - 1;
@@ -81,11 +92,11 @@ public:
 		return false;
 	}
 
-	void print_queue()
+	void print()
 	{
 		Stack<T> temp = *this;
 		while (!temp.empty()) {
-			cout << temp.front() << " ";
+			cout << temp.top() << " ";
 			temp.pop();
 		}
 		cout << '\n';
