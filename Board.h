@@ -17,17 +17,23 @@ public:
 
 	void initialize(Stack<int> randomBoard);
 
-	int** generateAWinningBoard();
-	int getHashCode();
-
 	char* board_XY_ToBinary();
 	int** binary_To_Board_XY();
 	//void  binaryToNumbers(int &num1 ,int &num2 ,const char* byte );
 
+	void moveUp();
+	void moveDown();
+	void moveLeft();
+	void moveRight();
 
-	int getValueInBoard_XY(const int x , const int y) ;
 
+	int getValueIn_Board_XY(const int x , const int y) ;
+	int** generateAWinningBoard();
+	int getHashCode();
+	int getEmptyspot();
+	int getValueIn_BinaryBoard(const int &place);
 
+	void putNumberInPlace_BinaryBoard(const int &num ,const int &place);
 
 	void printBoard_XY() const;
 	void helpToPrintBoard(const int num1) const;

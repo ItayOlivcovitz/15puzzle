@@ -137,6 +137,30 @@ void Board::initialize(Stack<int> randomBoard)
 		this->binaryBoard[i] = (num1 << 4) | (num2 << 0);
 		this->binaryBoard[i + 1] = (num3 << 4) | (num4 << 0);
 
+		/*cout << "byte " << i + 1 << " : " << num1<<endl;
+		cout << "byte " << i + 1 << " : " << num2<<endl;
+
+		cout << "num1: ";
+		printByte((num1 << 4));
+		cout << "num2: ";
+		printByte((num2 << 0));
+
+		cout << "num1+num2: ";
+		printByte(binaryBoard[i]);
+
+		cout << "" << endl;
+
+		cout << "byte " << i + 2 << " : " << num3 << endl;
+		cout << "byte " << i + 2 << " : " << num4 << endl;
+
+		cout << "num3: ";
+		printByte((num3 << 4));
+		cout << "num4: ";
+		printByte((num4 << 0));
+
+		cout << "num3+num4: ";
+		printByte(binaryBoard[i+1]);
+		cout << "" << endl;*/
 	}
 
 
@@ -172,6 +196,106 @@ int Board::getHashCode()
     return 0;
 }
 
+// * @brief return empty spot
+int Board::getEmptyspot()
+{
+	bool found = true;
+	int byteCounter = 1;
+	int num1 = 0, num2 = 0;
+	while (found)
+	{
+		num1 = (binaryBoard[byteCounter - 1] & 0xF0) >> 4;// -1 because array start at 0
+		num2 = binaryBoard[byteCounter-1] & 0x0F;
+
+		if (num1 == 15 || num2 == 15)
+		{
+			found = false;
+		}
+		else
+		{
+			byteCounter++;
+		}
+		
+	}
+	if (num1 == 15)
+	{
+		return (byteCounter-1) * 2 + 1;
+	}
+	else
+	{
+		return (byteCounter - 1) * 2 + 2;
+	}
+}
+
+int Board::getValueIn_BinaryBoard(const int& place)
+{
+	int temp;
+	int num1;
+	int placeBytes;
+	
+	if (place % 2 == 0)
+	{
+		placeBytes = place / 2;
+		temp = this->binaryBoard[placeBytes - 1]; // -1 because attay start at 0 
+		num1 = temp & 0x0F ;
+	}
+	
+	else
+	{
+		placeBytes = place / 2 + 1;
+		temp = this->binaryBoard[placeBytes - 1];// -1 because attay start at 0 
+		num1 = (temp & 0xF0) >> 4;
+	}
+	return num1;
+}
+
+void Board::putNumberInPlace_BinaryBoard(const int& num,const int &place)
+{
+	int temp;
+	int num1; 
+	int num2;
+	int num1OrNum2 = place;
+	int placeBytes; // board_XY index to index to byte 
+	
+	while (num1OrNum2 > 5)
+	{
+		num1OrNum2 = num1OrNum2 - 4;
+	}
+	
+	if (num1OrNum2 % 2 == 0)
+	{
+		placeBytes = place / 2;
+		temp = this->binaryBoard[placeBytes -1 ]; // array start at 0
+		num1 = (temp & 0xF0) >> 4;
+		num2 = num & 0x0F;
+
+		/*cout << "num1 :" << endl;
+		printByte(num1);
+
+		cout << "num2 :" << endl;
+		printByte(num2);*/
+		temp = (num1 << 4) | (num2 << 0);
+		this->binaryBoard[placeBytes -1] = temp;
+	}
+	else
+	{
+		placeBytes = place / 2 + 1;
+		temp = this->binaryBoard[placeBytes-1];
+		num1 = (num & 0x0F);  
+		num2 = temp & 0x0F;
+		
+		/*cout << "num1 :" << endl;
+		printByte(num1);
+
+		cout << "num2 :" << endl;
+		printByte(num2);*/
+
+		temp = (num1 << 4) | (num2 << 0);
+		this->binaryBoard[placeBytes -1] = temp;
+	}
+	
+}
+
 // * @brief convert Board_XY to binaryBoard
 // *
 // * @return char* --  binaryBoard
@@ -189,10 +313,10 @@ char* Board::board_XY_ToBinary()
 
 	for (int i = 0; i < 8; i= i+2) // 8 = size of the char* array
 	{
-		num1 = this->getValueInBoard_XY(0, coloum);
-		num2 = this->getValueInBoard_XY(1, coloum);
-		num3 = this->getValueInBoard_XY(2, coloum);
-		num4 = this->getValueInBoard_XY(3, coloum);
+		num1 = this->getValueIn_Board_XY(0, coloum);
+		num2 = this->getValueIn_Board_XY(1, coloum);
+		num3 = this->getValueIn_Board_XY(2, coloum);
+		num4 = this->getValueIn_Board_XY(3, coloum);
 		coloum++;
 
 		bytes[i] = (num1 << 4) | (num2 << 0);
@@ -243,6 +367,70 @@ int** Board::binary_To_Board_XY()
 	return newBoard_XY;
 }
 
+void Board::moveUp()
+{
+	int place_X, place_Y;
+	int num1 = this->getEmptyspot(); // num1 = empty spot
+	int num2;                       //  num2 = the value in place that i need to replace to num1
+	
+	if (num1 > 3)
+	{
+		place_X = num1 % 4 ; // board start at (0,0)
+		place_Y = (num1 / 4) - 1 ;
+		num2 = getValueIn_BinaryBoard(place_X  +  4* place_Y );
+		putNumberInPlace_BinaryBoard(15 , place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(num2, place_X + 4 * (place_Y + 1));
+	}
+}
+
+void Board::moveDown()
+{
+	int place_X, place_Y;
+	int num1 = this->getEmptyspot(); // num1 = empty spot
+	int num2;                       //  num2 = the value in place that i need to replace to num1
+
+	if (num1 < 13)
+	{
+		place_X = num1 % 4; // board start at (0,0)
+		place_Y = (num1 / 4) + 1;
+		num2 = getValueIn_BinaryBoard(place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(15, place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(num2, place_X + 4 * (place_Y - 1));
+	}
+}
+
+void Board::moveLeft()
+{
+	int place_X, place_Y;
+	int num1 = this->getEmptyspot(); // num1 = empty spot
+	int num2;                       //  num2 = the value in place that i need to replace to num1
+
+	if (num1 != 1 && num1 != 5 && num1 != 9 && num1 != 13)
+	{
+		place_X = ( num1 % 4 ) - 1; // board start at (0,0)
+		place_Y = (num1 / 4);
+		num2 = getValueIn_BinaryBoard(place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(15, place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(num2, (place_X + 1) + 4 * place_Y);
+	}
+}
+
+void Board::moveRight()
+{
+	int place_X, place_Y;
+	int num1 = this->getEmptyspot(); // num1 = empty spot
+	int num2;                       //  num2 = the value in place that i need to replace to num1
+
+	if (num1 != 4 && num1 != 8 && num1 != 12 && num1 != 16)
+	{
+		place_X = (num1 % 4) + 1; // board start at (0,0)
+		place_Y = (num1 / 4);
+		num2 = getValueIn_BinaryBoard(place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(15, place_X + 4 * place_Y);
+		putNumberInPlace_BinaryBoard(num2, (place_X - 1) + 4 * place_Y);
+	}
+}
+
 //void Board::binaryToNumbers(int& num1, int& num2, const char* byte)
 //{
 //	
@@ -262,7 +450,7 @@ int** Board::binary_To_Board_XY()
 //			base = base * 2;
 //		}
 //}
-int Board::getValueInBoard_XY(const int x, const int y)
+int Board::getValueIn_Board_XY(const int x, const int y)
 {
     return this->board_XY[y][x];
 }
@@ -307,6 +495,7 @@ void Board::helpToPrintBoard(const int num) const
 
 void Board::printBinaryBoard() const
 {
+	cout << "" << endl;
 	 int num1,num2, num3,num4;
 	for (int i = 0; i < 8; i = i+2) // 8 = size of the char* array
 	{
@@ -321,7 +510,10 @@ void Board::printBinaryBoard() const
 		helpToPrintBoard(num2);
 		helpToPrintBoard(num3);
 		helpToPrintBoard(num4);	
+		cout << "byte "<< i + 1 << ":  "<< num1 << "   " << num2 << "  ";
+		cout << "byte "<< i + 2 << ":  "<< num3 << "   " << num4 << "  ";
 	}
+	cout << "" << endl;
 }
 
 void Board::printByte(const char byte)  
